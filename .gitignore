@@ -1,0 +1,29 @@
+# ENVIRONNEMENT VIRTUEL
+venv/
+env/
+elfestore/  # ton dossier virtualenv local
+
+# FICHIERS PYTHON
+*.pyc
+__pycache__/
+
+# BASE DE DONNÉES (MySQL n'est pas local ici, donc pas besoin d'exclure `db.sqlite3`)
+*.sqlite3
+
+# STATIC & MEDIA (si générés automatiquement)
+media/
+staticfiles/
+
+# MIGRATIONS compilées
+**/migrations/
+!**/migrations/__init__.py
+
+# FICHIERS IDE
+.vscode/
+*.code-workspace
+.idea/
+partial/
+sailor/forms/
+# SYSTÈME
+.DS_Store
+Thumbs.db
