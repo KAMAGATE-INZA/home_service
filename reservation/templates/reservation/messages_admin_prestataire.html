@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Messagerie avec {{ prestataire.utilisateur.name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h2>Messagerie avec {{ prestataire.utilisateur.name }}</h2>
+
+  <div class="card mb-4" style="max-height: 400px; overflow-y: auto;">
+    <div class="card-body">
+      {% for msg in messages_list %}
+        <div class="mb-3 {% if msg.sender == user %}text-end{% endif %}">
+          <div>
+            <span class="fw-bold">{{ msg.sender.name }}</span>
+            <span class="text-muted small">{{ msg.created_at|date:"d/m/Y H:i" }}</span>
+          </div>
+          <div class="p-2 rounded {% if msg.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+            {{ msg.content|linebreaksbr }}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center text-muted">Aucun message.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.content.label_tag }}
+    {{ form.content }}
+    {% if form.content.errors %}
+      <div class="text-danger small">{{ form.content.errors.0 }}</div>
+    {% endif %}
+    <button type="submit" class="btn btn-success mt-2">Envoyer</button>
+  </form>
+</div>
+{% endblock %}
+

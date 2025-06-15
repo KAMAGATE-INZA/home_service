@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Envoyer un message{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <h2>Envoyer un message</h2>
+  <form method="post" class="mb-3">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.recipient.label_tag }}
+      {{ form.recipient }}
+      {% if form.recipient.errors %}
+        <div class="text-danger small">{{ form.recipient.errors.0 }}</div>
+      {% endif %}
+    </div>
+    <div class="mb-3">
+      {{ form.content.label_tag }}
+      {{ form.content }}
+      {% if form.content.errors %}
+        <div class="text-danger small">{{ form.content.errors.0 }}</div>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-success">Envoyer</button>
+  </form>
+  <a href="{% url 'boite_reception' %}" class="btn btn-secondary">Retour à la boîte de réception</a>
+</div>
+{% endblock %}

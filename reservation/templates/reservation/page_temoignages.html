@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<section id="testimonials" class="testimonials section-bg py-5">
+  <div class="container">
+    <div class="section-title">
+      <h2>Meilleurs Témoignages</h2>
+    </div>
+
+    <form method="get" class="mb-4 text-center">
+      <input type="text" name="q" placeholder="Rechercher un prestataire..." value="{{ query }}" class="form-control w-50 d-inline-block">
+      <button type="submit" class="btn btn-primary ms-2">Rechercher</button>
+    </form>
+
+    <div class="swiper testimonials-slider">
+      <div class="swiper-wrapper">
+        {% for a in avis %}
+          <div class="swiper-slide">
+            <div class="testimonial-item text-center">
+              {% if a.prestataire.photo %}
+                <img src="{{ a.prestataire.photo.url }}" class="testimonial-img rounded-circle" alt="Photo de {{ a.prestataire.utilisateur.name }}">
+              {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" class="testimonial-img rounded-circle" alt="Photo par défaut">
+              {% endif %}
+              <h3>{{ a.prestataire.utilisateur.name }}</h3>
+              <h4>Note : {{ a.note }}/5</h4>
+              <p>
+                <i class="bi bi-quote quote-icon-left"></i>
+                {{ a.commentaire }}
+                <i class="bi bi-quote quote-icon-right"></i>
+              </p>
+              <small>Par {{ a.client.name }} le {{ a.date|date:"d/m/Y" }}</small>
+            </div>
+          </div>
+        {% empty %}
+          <div class="swiper-slide">
+            <p class="text-muted">Aucun témoignage trouvé.</p>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="swiper-pagination mt-3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Swiper JS Init -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    new Swiper('.swiper', {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+  });
+</script>
+
+{% endblock %}
+

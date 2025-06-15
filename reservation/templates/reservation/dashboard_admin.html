@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tableau de bord Admin{% endblock %}
+{% block content %}
+
+
+<section id="top-prestataires" class="team section">
+  <div class="container">
+    <div class="section-title">
+      <h2>👑 Top 6 prestataires les mieux notés</h2>
+      <p>Les prestataires ayant les meilleures évaluations</p>
+    </div>
+
+    <div class="row gy-4">
+      {% for p in top_prestataires %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="team-member d-flex align-items-start">
+            <div class="pic">
+              {% if p.photo %}
+                <img src="{{ p.photo.url }}" class="img-fluid" alt="photo prestataire">
+              {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="photo défaut">
+              {% endif %}
+            </div>
+            <div class="member-info">
+              <h4>{{ p.utilisateur.name }}</h4>
+              <span>{{ p.utilisateur.email }}</span>
+              <p><i class="bi bi-phone"></i> {{ p.telephone|default:"-" }}</p>
+              <p><strong>Note moyenne :</strong> {{ p.moyenne|floatformat:2 }}/5</p>
+              <div class="social">
+                <a href="#"><i class="bi bi-envelope"></i></a>
+                <a href="#"><i class="bi bi-person-lines-fill"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>Aucun prestataire noté.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<section id="signalements" class="services section">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>📣 Signalements en attente</h2>
+      <p>Liste des prestataires signalés par les clients</p>
+    </div>
+
+    <div class="row gy-4">
+      {% for s in signalements %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="icon-box d-flex flex-column">
+            <div class="d-flex align-items-center mb-3">
+              {% if s.prestataire.photo %}
+                <img src="{{ s.prestataire.photo.url }}" class="img-fluid rounded-circle" style="width: 60px; height: 60px; object-fit: cover;" alt="photo">
+              {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="default">
+              {% endif %}
+              <div class="ms-3">
+                <h4 class="mb-1">{{ s.prestataire.utilisateur.name }}</h4>
+                <small>Email : {{ s.prestataire.utilisateur.email }}</small><br>
+                <small>Téléphone : {{ s.prestataire.telephone }}</small>
+              </div>
+            </div>
+
+            <p><strong>Client :</strong> {{ s.client.name }} | {{ s.client.email }}</p>
+            <p><strong>Motif :</strong> {{ s.motif }}</p>
+            <p><strong>Description :</strong> {{ s.description }}</p>
+
+            {% if s.preuve %}
+              <p><a href="{{ s.preuve.url }}" target="_blank">📎 Voir la preuve</a></p>
+            {% endif %}
+
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              {% if s.statut == 'en_attente' %}
+                <a href="{% url 'avertir_prestataire' s.id %}" class="btn btn-warning btn-sm">Avertir</a>
+                <a href="{% url 'bannir_prestataire' s.id %}" class="btn btn-danger btn-sm">Bannir</a>
+              {% elif s.statut == 'averti' %}
+                <span class="badge bg-warning text-dark">Averti</span>
+              {% elif s.statut == 'banni' %}
+                <span class="badge bg-danger">Banni</span>
+              {% endif %}
+              <a href="{% url 'defense_signalement' s.id %}" class="btn btn-info btn-sm">Voir défense</a>
+              <a href="{% url 'messages_admin_prestataire' s.prestataire.id %}" class="btn btn-secondary btn-sm">Contacter</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12"><p class="text-muted">Aucun signalement pour le moment.</p></div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+

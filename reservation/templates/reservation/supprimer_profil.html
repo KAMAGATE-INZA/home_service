@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Supprimer mon profil{% endblock %}
+{% block content %}
+<div class="container my-4">
+  <h2>Supprimer mon profil</h2>
+  <p class="text-danger">Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est <strong>irréversible</strong>.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer mon profil</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section id="hero" class="hero section dark-background">
+  <div id="hero-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+    {% for i in "123"|make_list %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img src="{% static 'sailor/assets/img/hero-carousel/hero-carousel-'|add:i|add:'.jpg' %}" alt="Slide {{ i }}">
+        <div class="carousel-container">
+          <h2>{% if forloop.first %}Bienvenue sur Elfeservice{% elif forloop.counter == 2 %}Des professionnels à votre service{% else %}Des experts à votre écoute{% endif %}</h2>
+          <p>
+            {% if forloop.first %}
+              Trouvez le service parfait pour votre maison.<br>Profitez d’un réseau de professionnels qualifiés.
+            {% elif forloop.counter == 2 %}
+              Bénéficiez d’une expérience fiable, agréable et sans souci.
+            {% else %}
+              Des solutions personnalisées et efficaces vous attendent.
+            {% endif %}
+          </p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn-get-started">Espace {{ user.name }}</a>
+          {% else %}
+            <a href="{% url 'register' %}" class="btn-get-started">S'inscrire</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <a class="carousel-control-prev" href="#hero-carousel" role="button" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon bi bi-chevron-left"></span>
+    </a>
+    <a class="carousel-control-next" href="#hero-carousel" role="button" data-bs-slide="next">
+      <span class="carousel-control-next-icon bi bi-chevron-right"></span>
+    </a>
+    <ol class="carousel-indicators"></ol>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services" class="services section-bg mt-5">
+  <div class="container">
+    <div class="section-title">
+      <h2>Services les plus demandés</h2>
+      <p>Découvrez les services les plus populaires proposés sur Elfeservice.</p>
+    </div>
+    <div class="row gy-4">
+      {% for service in services %}
+        <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+          <div class="icon-box">
+            <div class="icon"><i class="bi bi-tools"></i></div>
+            <h4><a href="{% url 'service_detail' service.id %}">{{ service.nom }}</a></h4>
+            <p>{{ service.description|truncatewords:15 }}</p>
+            <p><strong>{{ service.nb_prestataires }}</strong> prestataire{{ service.nb_prestataires|pluralize }} disponible{{ service.nb_prestataires|pluralize }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <p>Aucun service trouvé.</p>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'page_services' %}" class="btn btn-outline-primary">Voir tous les services</a>
+  </div>
+</section>
+
+<!-- Prestataires -->
+<section id="prestataires" class="team section-bg">
+  <div class="container">
+    <div class="section-title">
+      <h2>Meilleurs prestataires</h2>
+      <p>Découvrez les professionnels les mieux notés et les plus recommandés.</p>
+    </div>
+    <div class="row gy-4">
+      {% for provider in prestataires %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="team-member d-flex align-items-start">
+            <div class="pic">
+              {% if provider.photo %}
+                <img src="{{ provider.photo.url }}" class="img-fluid" alt="{{ provider.utilisateur.name }}">
+              {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="photo défaut">
+              {% endif %}
+            </div>
+            <div class="member-info">
+              <h4>
+                <a href="{% url 'detail_prestataire' provider.id %}">
+                  {{ provider.utilisateur.name }}
+                </a>
+              </h4>
+              <span>{{ provider.zone }}</span>
+              <p>{{ provider.utilisateur.email }}</p>
+
+              <div class="social">
+                {% with email_contact=None %}
+                  {% for contact in provider.utilisateur.contacts.all %}
+                    {% if contact.type_contact.nom == "Facebook" %}
+                      <a href="https://facebook.com/{{ contact.valeur }}"><i class="bi bi-facebook"></i></a>
+                    {% elif contact.type_contact.nom == "Instagram" %}
+                      <a href="https://instagram.com/{{ contact.valeur }}"><i class="bi bi-instagram"></i></a>
+                    {% elif contact.type_contact.nom == "LinkedIn" %}
+                      <a href="https://linkedin.com/in/{{ contact.valeur }}"><i class="bi bi-linkedin"></i></a>
+                    {% elif contact.type_contact.nom == "Twitter" %}
+                      <a href="https://twitter.com/{{ contact.valeur }}"><i class="bi bi-twitter-x"></i></a>
+                    {% elif contact.type_contact.nom == "WhatsApp" %}
+                      <a href="https://wa.me/{{ contact.valeur }}"><i class="bi bi-whatsapp"></i></a>
+                    {% elif contact.type_contact.nom == "Téléphone" %}
+                      <a href="tel:{{ contact.valeur }}"><i class="bi bi-telephone"></i></a>
+                    {% elif contact.type_contact.nom == "Email" and contact.valeur %}
+                      <a href="mailto:{{ contact.valeur }}"><i class="bi bi-envelope"></i></a>
+                      {% with email_contact=1 %}{% endwith %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if not email_contact %}
+                    <a href="mailto:{{ provider.utilisateur.email }}"><i class="bi bi-envelope"></i></a>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>Aucun prestataire trouvé.</p>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'page_prestataire' %}" class="btn btn-outline-primary">Voir tous les prestataires</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Avis -->
+<section id="avis-prestataires" class="testimonials section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Témoignages</h2>
+    </div>
+
+    {% if avis %}
+    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        {% for testimonial in avis %}
+          {% if testimonial.prestataire.photo %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="testimonial-item p-4">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{{ testimonial.prestataire.photo.url }}" class="testimonial-img" alt="{{ testimonial.prestataire.utilisateur.name }}">
+                <div class="ps-3">
+                  <h3>{{ testimonial.prestataire.utilisateur.name }}</h3>
+                  <h4>{{ testimonial.prestataire.zone }}</h4>
+                </div>
+              </div>
+              <p>
+                <i class="bi bi-quote quote-icon-left"></i>
+                {{ testimonial.commentaire|truncatewords:30 }}
+                <i class="bi bi-quote quote-icon-right"></i>
+              </p>
+              <small>par {{ testimonial.client.name }} — {{ testimonial.date|date:"d/m/Y" }}</small>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+    {% else %}
+      <p class="text-muted text-center">Aucun témoignage disponible.</p>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'page_temoignages' %}" class="btn btn-outline-primary">Voir tous les témoignage</a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

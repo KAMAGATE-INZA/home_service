@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Meilleurs Prestataires{% endblock %}
+{% block content %}
+
+
+<h2 class="text-center mb-5">Les meilleurs prestataires</h2>
+
+{% if meilleurs_prestataires %}
+  <p class="text-center mb-4">Découvrez les prestataires les mieux notés par les utilisateurs.</p>
+{% else %}
+  <p class="text-center text-muted">Aucun prestataire trouvé pour le moment.</p>
+{% endif %}
+<section id="team" class="team section">
+  <div class="container">
+
+    <div class="row gy-4">
+      {% for p in meilleurs_prestataires %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="team-member d-flex align-items-start">
+            <div class="pic">
+              <img src="{{ p.photo.url }}" class="img-fluid" alt="Photo de {{ p.utilisateur.name }}">
+            </div>
+            <div class="member-info">
+              <h4>
+                <a href="{% url 'detail_prestataire' p.id %}">{{ p.utilisateur.name }}</a>
+              </h4>
+              <span>{{ p.zone }}</span>
+              <p>
+                {% if p.note_moyenne %}
+                  ⭐ {{ p.note_moyenne|floatformat:1 }}/5
+                {% else %}
+                  Pas encore de note
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">Aucun prestataire trouvé.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

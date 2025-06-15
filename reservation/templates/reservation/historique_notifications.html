@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Historique des notifications{% endblock %}
+
+{% block content %}
+<section id="notifications" class="contact section">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>📩 Historique des notifications</h2>
+    </div>
+
+    <div class="mb-4 text-end">
+      <a href="{% url 'supprimer_toutes_notifications' %}" class="btn btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer toutes vos notifications ?');">
+        🗑️ Tout supprimer
+      </a>
+    </div>
+
+    {% if notifications %}
+      <ul class="list-group">
+        {% for notif in notifications %}
+          <li class="list-group-item d-flex justify-content-between align-items-start {% if not notif.lu %}fw-bold{% endif %}">
+            <div class="ms-2 me-auto">
+              {{ notif.message }}<br>
+              <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+            </div>
+            <div class="btn-group btn-group-sm" role="group">
+              {% if not notif.lu %}
+                <a href="{% url 'marquer_notification_lue' notif.id %}" class="btn btn-outline-primary">✔️ Marquer lue</a>
+              {% endif %}
+              <a href="{% url 'supprimer_notification' notif.id %}" class="btn btn-outline-danger">🗑️ Supprimer</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Aucune notification.</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Profil du prestataire{% endblock %}
+{% block content %}
+    
+    <div class="page-title light-background">
+      <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">{{ prestataire.utilisateur.name }}</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="current">{{ prestataire.utilisateur.name }}</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <section id="prestataires" class="team section-bg">
+        <div class="container">
+            
+            <div class="row gy-4">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="team-member d-flex align-items-start">
+                        <div class="pic">
+                        <img src="{{ prestataire.photo.url }}" class="img-fluid" alt="{{ provider.utilisateur.name }}">
+                        </div>
+                        <div class="member-info">
+                        <span class="text-muted"><i class="bi bi-geo-alt-fill"></i> {{ prestataire.zone }}</span>
+                        <p><i class="bi bi-envelope"></i> {{ prestataire.utilisateur.email }}</p>
+
+                        <div class="social mt-2">
+                            {% for contact in prestataire.utilisateur.contacts.all %}
+                            {% if contact.type_contact.nom == "Facebook" %}
+                                <a href="https://facebook.com/{{ contact.valeur }}" target="_blank"><i class="bi bi-facebook"></i></a>
+                            {% elif contact.type_contact.nom == "Instagram" %}
+                                <a href="https://instagram.com/{{ contact.valeur }}" target="_blank"><i class="bi bi-instagram"></i></a>
+                            {% elif contact.type_contact.nom == "LinkedIn" %}
+                                <a href="https://linkedin.com/in/{{ contact.valeur }}" target="_blank"><i class="bi bi-linkedin"></i></a>
+                            {% elif contact.type_contact.nom == "Twitter" %}
+                                <a href="https://twitter.com/{{ contact.valeur }}" target="_blank"><i class="bi bi-twitter-x"></i></a>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+
+
+                        <div class="social">
+                            {% with email_contact=None %}
+                            {% for contact in prestataire.utilisateur.contacts.all.all %}
+                                {% if contact.type_contact.nom == "Facebook" %}
+                                <a href="https://facebook.com/{{ contact.valeur }}"><i class="bi bi-facebook"></i></a>
+                                {% elif contact.type_contact.nom == "Instagram" %}
+                                <a href="https://instagram.com/{{ contact.valeur }}"><i class="bi bi-instagram"></i></a>
+                                {% elif contact.type_contact.nom == "LinkedIn" %}
+                                <a href="https://linkedin.com/in/{{ contact.valeur }}"><i class="bi bi-linkedin"></i></a>
+                                {% elif contact.type_contact.nom == "Twitter" %}
+                                <a href="https://twitter.com/{{ contact.valeur }}"><i class="bi bi-twitter-x"></i></a>
+                                {% elif contact.type_contact.nom == "WhatsApp" %}
+                                <a href="https://wa.me/{{ contact.valeur }}"><i class="bi bi-whatsapp"></i></a>
+                                {% elif contact.type_contact.nom == "Téléphone" %}
+                                <a href="tel:{{ contact.valeur }}"><i class="bi bi-telephone"></i></a>
+                                {% elif contact.type_contact.nom == "Email" and contact.valeur %}
+                                <a href="mailto:{{ contact.valeur }}"><i class="bi bi-envelope"></i></a>
+                                {% with email_contact=1 %}
+                                {% endwith %}
+                                {% endif %}
+                            {% endfor %}
+                            {# Si aucun contact de type Email n'a été trouvé, on affiche l'email du compte #}
+                            {% if not email_contact and p.utilisateur.email %}
+                                <a href="mailto:{{ p.utilisateur.email }}"><i class="bi bi-envelope"></i></a>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        <div class="mt-2">
+                            {% if note_moyenne %}
+                            ⭐ <strong>{{ note_moyenne|floatformat:1 }}/5</strong>
+                            {% else %}
+                            <span class="text-muted">Pas encore de note</span>
+                            {% endif %}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="pricing" class="pricing section">
+
+        <div class="container">
+
+            <div class="row gy-3">
+
+                <h3>Services proposés</h3>
+
+                {% for so in services_offerts %}
+
+                    <div class="col-xl-3 col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="pricing-item featured">
+                            <h3>{{ so.service.nom }}</h3>
+                            <h4>{{ so.prix }} <sup>FCFA</sup><span></span></h4>
+                            <ul>
+                                <li>{{ so.description }}</li>
+                            </ul>
+                            <div class="btn-wrap">
+                                <a href="{% url 'reserver_service' so.service.id %}?prestataire={{ prestataire.id }}" class="btn btn-primary">Réserver</a>
+                            </div>
+                        </div>
+                    </div><!-- End Pricing Item -->
+
+                {% empty %}
+                    <li>Aucun service proposé.</li>
+                {% endfor %}
+
+            </div>
+
+        </div>
+        {% if user.is_authenticated and user.role == 'client' and reservations_terminees %}
+          <div class="text-center mt-4">
+            <a href="{% url 'signaler_prestataire' prestataire.id %}" class="btn btn-danger btn-sm">
+              Signaler ce prestataire
+            </a>
+          </div>
+        {% endif %}
+    </section><!-- /Pricing Section -->
+
+    
+
+{% endblock %}

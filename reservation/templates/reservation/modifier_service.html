@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modifier un Service{% endblock %}
+
+{% block content %}
+<div class="page-title light-background">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">Modifier un Service</h1>
+    <nav class="breadcrumbs">
+      <ol>
+        <li><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="current">Modifier un Service</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="container my-5">
+  <h2 class="text-center mb-4">Mettre à jour un Service</h2>
+
+  <form method="post" id="form-modifier-service" class="row g-3">
+    {% csrf_token %}
+
+    <!-- Champ Service (avec datalist) -->
+    <div class="col-md-6">
+      <label class="form-label">{{ form.service.label }}</label>
+      {{ form.service }}
+      <datalist id="services-list">
+        {% for s in services_autorises %}
+          <option value="{{ s }}">
+        {% endfor %}
+      </datalist>
+      {% if form.service.errors %}
+        <div class="text-danger small">{{ form.service.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Champ Prix -->
+    <div class="col-md-6">
+      <label class="form-label">{{ form.prix.label }}</label>
+      {{ form.prix }}
+      {% if form.prix.errors %}
+        <div class="text-danger small">{{ form.prix.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Champ Description -->
+    <div class="col-12">
+      <label class="form-label">{{ form.description.label }}</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="text-danger small">{{ form.description.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Bouton -->
+    <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+      <a href="{% url 'mes_services' %}" class="btn btn-secondary">Annuler</a>
+    </div>
+  </form>
+</section>
+
+<script>
+  const SERVICES_AUTORISES = [
+    {% for s in services_autorises %}
+      `{{ s|escapejs }}`{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#form-modifier-service');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        const input = document.querySelector('input[name="service"]');
+        if (
+          input &&
+          !SERVICES_AUTORISES.map(s => s.toLowerCase()).includes(input.value.trim().toLowerCase())
+        ) {
+          alert("Ce service n'est pas reconnu. Veuillez choisir un service connu.");
+          e.preventDefault();
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+

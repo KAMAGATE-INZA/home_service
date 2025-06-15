@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Boîte de réception{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <div class="section-title">
+    <h2>📥 Boîte de réception</h2>
+    <p>Vos messages récents</p>
+  </div>
+
+  {% if messages_recus %}
+    <div class="list-group">
+      {% for msg in messages_recus %}
+        <a href="{% if msg.reservation %}{% url 'messages_reservation' msg.reservation.id %}{% else %}#{% endif %}"
+           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center 
+                  {% if not msg.is_read %}list-group-item-warning{% endif %}">
+          <div>
+            <h6 class="mb-1">
+              <i class="bi bi-person-fill"></i>
+              {{ msg.sender.name }}
+              {% if not msg.is_read %}
+                <span class="badge bg-danger ms-2">Nouveau</span>
+              {% endif %}
+            </h6>
+            <p class="mb-1">{{ msg.content|truncatechars:100 }}</p>
+            <small class="text-muted">{{ msg.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
+          <i class="bi bi-arrow-right-circle-fill fs-4 text-primary"></i>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">Vous n’avez encore reçu aucun message.</p>
+  {% endif %}
+</section>
+{% endblock %}

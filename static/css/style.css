@@ -1,0 +1,233 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 5%;
+      background: white;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+
+    .nav-left, .nav-right {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #2d2d2d;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    /* Section Héro */
+    .hero-section {
+      padding: 8rem 5%;
+      text-align: center;
+      background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+      position: relative;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      color: #2d2d2d;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+    .search-container {
+      max-width: 600px;
+      margin: 2rem auto 0;
+      position: relative;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1rem 2rem;
+      border: 2px solid #4a90e2;
+      border-radius: 30px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+    }
+
+    .search-button {
+      padding: 1rem 2.5rem;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .search-button:hover {
+      background: #357abd;
+      transform: translateY(-2px);
+    }
+
+
+    /* Section Services */
+    .services-slider {
+      padding: 4rem 5%;
+      background: white;
+    }
+
+    .service-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      margin: 1rem;
+      min-width: 300px;
+    }
+
+    /* Section Prestataires */
+    .providers-section {
+      padding: 4rem 5%;
+      background: #f8f9fa;
+    }
+
+    .provider-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      margin: 1rem;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    /* Témoignages */
+    .testimonials-section {
+      padding: 4rem 5%;
+      background: white;
+    }
+
+    .testimonial-card {
+      background: #f8f9fa;
+      padding: 2rem;
+      border-radius: 15px;
+      margin: 1rem;
+      min-width: 400px;
+    }
+
+    /* Footer */
+    footer {
+      background: #2d2d2d;
+      color: white;
+      padding: 4rem 5%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+
+    .slider-container {
+      overflow-x: auto;
+      display: flex;
+      padding: 2rem 0;
+      scroll-behavior: smooth;
+    }
+
+    /* les formulaires*/
+  .form-group {
+  margin-bottom: 1.5rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+form input, form select, form textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s ease;
+}
+
+form input:focus, form select:focus, form textarea:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+form button {
+  padding: 0.75rem 2rem;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+form button:hover {
+  background: #357abd;
+}
+
+/* dashboard*/
+.dashboard-cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+
+.card {
+  background: #fff;
+  padding: 2rem;
+  flex: 1 1 200px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.card h3 {
+  font-size: 2rem;
+  color: #4a90e2;
+  margin: 0;
+}
+
+.card span {
+  font-size: 1rem;
+  color: #555;
+}
+
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.badge-attente {
+  background-color: #f0ad4e; /* orange */
+}
+
+.badge-acceptee {
+  background-color: #5cb85c; /* vert */
+}
+
+.badge-refusee {
+  background-color: #d9534f; /* rouge */
+}

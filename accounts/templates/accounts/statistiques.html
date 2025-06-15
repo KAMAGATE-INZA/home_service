@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Statistiques{% endblock %}
+
+{% block content %}
+<section id="stats" class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Statistiques de vos réservations</h2>
+      <p>Analyse de vos activités en tant que prestataire</p>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <canvas id="reservationChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('reservationChart').getContext('2d');
+const reservationChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: {{ labels|safe }},
+    datasets: [{
+      label: 'Nombre de Réservations',
+      data: {{ data|safe }},
+      backgroundColor: [
+        '#0d6efd',
+        '#198754',
+        '#dc3545',
+        '#ffc107',
+        '#6f42c1'
+      ],
+      borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Statistiques des réservations par statut'
+      }
+    }
+  }
+});
+</script>
+{% endblock %}
+

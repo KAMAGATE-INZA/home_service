@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Réserver un service{% endblock %}
+
+{% block content %}
+<section id="reserver" class="contact section">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>Réserver : {{ service.nom }}</h2>
+      {% if service.description %}
+        <p>{{ service.description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8 mt-4 mt-lg-0">
+        <form method="POST" role="form" >
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group mt-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="validate" style="color: red;">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">✅ Confirmer la réservation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+

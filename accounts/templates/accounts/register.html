@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<section class="contact pt-5">
+  <div class="container">
+    <div class="section-title">
+      <h2>Créer un compte</h2>
+      <p class="text-center mb-4">Remplissez les informations pour vous inscrire.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <form method="POST">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group mt-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="validate" style="color: red;">{{ field.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="section-title mt-4">
+            <h4>Contacts</h4>
+          </div>
+
+          <div id="contacts-formset">
+            {{ contact_formset.management_form }}
+            {% for contact_form in contact_formset %}
+              <div class="contact-form form-group mb-3 p-3" style="border: 1px solid #ccc; border-radius: 6px;">
+                <label>{{ contact_form.type_contact.label }}</label>
+                {{ contact_form.type_contact }}
+                <datalist id="type-contact-list">
+                  <option value="Téléphone">
+                  <option value="Facebook">
+                  <option value="WhatsApp">
+                  <option value="Email">
+                </datalist>
+
+                <label class="mt-2">{{ contact_form.valeur.label }}</label>
+                {{ contact_form.valeur }}
+
+                {% if contact_formset.can_delete %}
+                  <div class="mt-2">
+                    {{ contact_form.DELETE }}
+                    <span style="color:red;cursor:pointer;" class="remove-contact">Supprimer</span>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="text-center mt-3" id="add-contact-container">
+            <button type="button" id="add-contact" class="btn btn-primary mt-3">Ajouter un contact</button>
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary mt-3">S'inscrire</button>
+          </div>
+        </form>
+
+        <p class="mt-3 text-center">Déjà un compte ? <a href="{% url 'login' %}">Connexion</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let formsetDiv = document.getElementById('contacts-formset');
+    let addBtn = document.getElementById('add-contact');
+    let totalForms = document.querySelector('[name$="-TOTAL_FORMS"]');
+
+    addBtn.onclick = function () {
+      let currentFormCount = parseInt(totalForms.value);
+      let forms = formsetDiv.querySelectorAll('.contact-form');
+      let newForm = forms[forms.length - 1].cloneNode(true);
+
+      // Nettoie les valeurs des inputs et select
+      newForm.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.type !== "hidden") el.value = '';
+        // Pour les cases à cocher DELETE
+        if (el.type === "checkbox") el.checked = false;
+      });
+
+      // Met à jour les attributs name et id
+      newForm.innerHTML = newForm.innerHTML.replace(/form-(\d+)-/g, 'form-' + currentFormCount + '-');
+      formsetDiv.appendChild(newForm);
+      totalForms.value = currentFormCount + 1;
+    };
+
+    formsetDiv.addEventListener('click', function (e) {
+      if (e.target.classList.contains('remove-contact')) {
+        let forms = formsetDiv.querySelectorAll('.contact-form');
+        if (forms.length > 1) {
+          e.target.closest('.contact-form').remove();
+          totalForms.value = formsetDiv.querySelectorAll('.contact-form').length;
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}
