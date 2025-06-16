@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<section class="contact pt-5">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>Connexion</h2>
+      <p class="text-center mb-4">Connectez-vous à votre compte pour <br> accéder à votre tableau de bord.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+
+        <form method="POST">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group mt-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="validate" style="color: red;">{{ field.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary mt-3">Se connecter</button>
+        </form>
+
+        <p class="mt-3 text-center">Pas encore de compte ?
+          <a href="{% url 'register' %}">Créer un compte</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+
+

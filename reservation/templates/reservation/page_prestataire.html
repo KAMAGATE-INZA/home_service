@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Meilleurs Prestataires{% endblock %}
+{% block content %}
+
+
+<h2 class="text-center mb-5">Les meilleurs prestataires</h2>
+
+{% if meilleurs_prestataires %}
+  <p class="text-center mb-4">Découvrez les prestataires les mieux notés par les utilisateurs.</p>
+{% else %}
+  <p class="text-center text-muted">Aucun prestataire trouvé pour le moment.</p>
+{% endif %}
+<section id="team" class="team section">
+  <div class="container">
+
+    <div class="row gy-4">
+      {% for p in meilleurs_prestataires %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="team-member d-flex align-items-start">
+            <div class="pic">
+              <img src="{{ p.photo.url }}" class="img-fluid" alt="Photo de {{ p.utilisateur.name }}">
+            </div>
+            <div class="member-info">
+              <h4>
+                <a href="{% url 'detail_prestataire' p.id %}">{{ p.utilisateur.name }}</a>
+              </h4>
+              <span>{{ p.zone }}</span>
+              <p>
+                {% if p.note_moyenne %}
+                  ⭐ {{ p.note_moyenne|floatformat:1 }}/5
+                {% else %}
+                  Pas encore de note
+                {% endif %}
+              </p>
+
+              <div class="social">
+                {% with email_contact=None %}
+                  {% for contact in p.utilisateur.contacts.all %}
+                    {% if contact.type_contact.nom == "Facebook" %}
+                      <a href="https://facebook.com/{{ contact.contact }}"><i class="bi bi-facebook"></i></a>
+                    {% elif contact.type_contact.nom == "Instagram" %}
+                      <a href="https://instagram.com/{{ contact.contact }}"><i class="bi bi-instagram"></i></a>
+                    {% elif contact.type_contact.nom == "LinkedIn" %}
+                      <a href="https://linkedin.com/in/{{ contact.contact }}"><i class="bi bi-linkedin"></i></a>
+                    {% elif contact.type_contact.nom == "Twitter" %}
+                      <a href="https://twitter.com/{{ contact.contact }}"><i class="bi bi-twitter-x"></i></a>
+                    {% elif contact.type_contact.nom == "WhatsApp" %}
+                      <a href="https://wa.me/{{ contact.contact }}"><i class="bi bi-whatsapp"></i></a>
+                    {% elif contact.type_contact.nom == "Téléphone" %}
+                      <a href="tel:{{ contact.contact }}"><i class="bi bi-telephone"></i></a>
+                    {% elif contact.type_contact.nom == "Email" and contact.contact %}
+                      <a href="mailto:{{ contact.contact }}"><i class="bi bi-envelope"></i></a>
+                      {% with email_contact=1 %}
+                      {% endwith %}
+                    {% endif %}
+                  {% endfor %}
+                  {# Si aucun contact de type Email n'a été trouvé, on affiche l'email du compte #}
+                  {% if not email_contact and p.utilisateur.email %}
+                    <a href="mailto:{{ p.utilisateur.email }}"><i class="bi bi-envelope"></i></a>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-muted">Aucun prestataire trouvé.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Réservations reçues{% endblock %}
+
+{% block content %}
+<section id="reservations" class="team section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Réservations reçues</h2>
+    </div>
+
+    {% if reservations %}
+      <div class="row gy-4">
+        {% for r in reservations %}
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+            <div class="member w-100">
+              <div class="member-content">
+                <h4>{{ r.client.name }}</h4>
+                <p><strong>Service :</strong> {{ r.service_offert.service.nom }}</p>
+                <p><strong>Date :</strong> {{ r.date }} à {{ r.heure }}</p>
+
+                <p>
+                  <strong>Statut :{{ r.get_statut_display }}</strong>
+                  <span class="badge 
+                    {% if r.statut == 'en_attente' %} bg-warning text-dark
+                    {% elif r.statut == 'acceptée' %} bg-success
+                    {% elif r.statut == 'refusée' %} bg-danger
+                    {% elif r.statut == 'terminée' %} bg-primary
+                    {% elif r.statut == 'en_attente_confirmation' %} bg-info
+                    {% elif r.statut == 'reportée' %} bg-secondary
+                    {% endif %}">
+                    {{ r.get_statut_display }}
+                  </span>
+                </p>
+
+                {% if r.statut == 'en_attente' %}
+                  <form method="POST" action="{% url 'action_reservation' r.id 'accepter' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-success btn-sm">Accepter</button>
+                  </form>
+                  <form method="POST" action="{% url 'action_reservation' r.id 'refuser' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Refuser</button>
+                  </form>
+                {% elif r.statut == 'acceptée' %}
+                  <form method="POST" action="{% url 'changer_statut_reservation' r.id 'terminée' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm mt-2">✅ Marquer comme terminée</button>
+                  </form>
+                {% endif %}
+
+                {% if r.statut == 'en_attente' or r.statut == 'acceptée' %}
+                  <a href="{% url 'reporter_reservation' r.id %}" class="btn btn-warning btn-sm mt-2">Reporter</a>
+                {% endif %}
+
+                {% if r.statut == 'en_attente_confirmation' and r.nouvelle_date and r.nouvelle_heure and user != r.reporteur %}
+                  <p class="mt-2">Nouvelle date proposée : <strong>{{ r.nouvelle_date }}</strong> à <strong>{{ r.nouvelle_heure }}</strong></p>
+                  <a href="{% url 'confirmer_report' r.id %}" class="btn btn-success btn-sm">Confirmer</a>
+                  <a href="{% url 'refuser_report' r.id %}" class="btn btn-danger btn-sm">Refuser</a>
+                {% endif %}
+
+                {% if r.statut == 'reportée' %}
+                  <p class="mt-2"><em>Date reportée : <strong>{{ r.date }}</strong> à <strong>{{ r.heure }}</strong></em></p>
+                  <a href="{% url 'reporter_reservation' r.id %}" class="btn btn-warning btn-sm mt-2">Reporter</a>
+                {% endif %}
+
+                <!-- Bouton pour accéder à la messagerie liée à la réservation -->
+                <a href="{% url 'messages_reservation' r.id %}" class="btn btn-primary btn-sm mt-2">
+                  💬 Voir la conversation
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Aucune réservation reçue pour le moment.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+

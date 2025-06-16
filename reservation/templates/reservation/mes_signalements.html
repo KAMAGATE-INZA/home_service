@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Mes signalements{% endblock %}
+{% load static %}
+
+{% block content %}
+<section id="signalements" class="team section">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>📢 Mes signalements reçus</h2>
+      <p>Retrouvez ici la liste des signalements vous concernant.</p>
+    </div>
+
+    {% if signalements %}
+      <div class="row gy-4">
+        {% for s in signalements %}
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="team-member d-flex align-items-start">
+              <div class="pic">
+                {% if s.client.prestataire.photo %}
+                  <img src="{{ s.client.prestataire.photo.url }}" class="img-fluid" alt="">
+                {% else %}
+                  <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="Client">
+                {% endif %}
+              </div>
+              <div class="member-info">
+                <h4>{{ s.client.name }}</h4>
+                <span>Client</span>
+                <p><strong>Motif :</strong> {{ s.motif }}</p>
+                <p><strong>Description :</strong> {{ s.description|truncatewords:20 }}</p>
+                {% if s.preuve %}
+                  <p><a href="{{ s.preuve.url }}" target="_blank">📎 Voir la preuve</a></p>
+                {% endif %}
+                <p><strong>Statut :</strong>
+                  {% if s.statut == "en_attente" %}
+                    <span class="badge bg-warning text-dark">En attente</span>
+                  {% elif s.statut == "averti" %}
+                    <span class="badge bg-primary">Averti</span>
+                  {% elif s.statut == "banni" %}
+                    <span class="badge bg-danger">Banni</span>
+                  {% endif %}
+                </p>
+                <a href="{% url 'defense_signalement' s.id %}" class="btn btn-outline-primary btn-sm mt-2">Défendre mon profil</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-center">✅ Aucun signalement pour le moment.</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}
+

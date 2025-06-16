@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<section class="pt-5 pb-5">
+  <div class="container " >
+
+    <div class="section-title">
+      <h2>Mon Profil</h2>
+      <p>Informations personnelles</p>
+    </div>
+
+    <div class="row gy-4">
+      <div class="col-md-6">
+        <div class="team-member d-flex align-items-start">
+          <div class="pic">
+            {% if user.role == "prestataire" and user.prestataire.photo %}
+              <img src="{{ user.prestataire.photo.url }}" alt="Photo de profil" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+            {% elif user.photo %}
+              <img src="{{ user.photo.url }}" alt="Photo de profil" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'img/default-avatar.png' %}" alt="Photo de profil" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+            {% endif %}
+          </div>
+          <div class="member-info ps-3">
+            <h4>{{ user.name }}</h4>
+            <p><strong>Email :</strong> {{ user.email }}</p>
+            <p><strong>Profil :</strong> {{ user.get_role_display }}</p>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <h5>Contacts</h5>
+          {% if user.contacts.all %}
+            <ul class="list-unstyled">
+              {% for contact in user.contacts.all %}
+                <li>
+                  <strong>{{ contact.type_contact.nom }} :</strong> {{ contact.contact }}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Aucun contact enregistré.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+      <a href="{% url 'modifier_profil' %}" class="btn btn-primary">Modifier mon profil</a>
+      <a href="{% url 'supprimer_profil' %}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est irréversible.');">Supprimer mon profil</a>
+
+      {% if user.role == 'prestataire' and user.prestataire %}
+        <a href="{% url 'boite_reception_prestataire' %}" class="btn btn-outline-primary shadow-sm">
+          <i class="bi bi-inbox"></i> Voir mes messages
+        </a>
+        <a href="{% url 'messages_admin_prestataire' user.prestataire.id %}" class="btn btn-outline-secondary shadow-sm">
+          <i class="bi bi-chat-dots"></i> Contacter l’administrateur
+        </a>
+      {% endif %}
+    </div>
+
+    {% if user.role == 'client' %}
+    <div class="mt-5">
+      <h3>Mes Réservations</h3>
+      {% if reservations %}
+        <ul class="list-group">
+          {% for r in reservations %}
+            <li class="list-group-item">
+              {{ r.service_offert.service.nom }} avec {{ r.service_offert.prestataire.utilisateur.name }}<br>
+              Le {{ r.date }} à {{ r.heure }} — <strong>{{ r.statut }}</strong>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>Aucune réservation pour le moment.</p>
+      {% endif %}
+    </div>
+
+    {% elif user.role == 'prestataire' %}
+      {% if prestataire %}
+        <div class="mt-5">
+          <h3>Mes Services Offerts</h3>
+          {% if offres %}
+            <ul class="list-group">
+              {% for o in offres %}
+                <li class="list-group-item">
+                  {{ o.service.nom }} — {{ o.prix }} FCFA
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Vous n'avez encore ajouté aucun service.</p>
+          {% endif %}
+        </div>
+
+        <div class="mt-5">
+          <h3>Demandes Reçues</h3>
+          {% if demandes %}
+            <ul class="list-group">
+              {% for d in demandes %}
+                <li class="list-group-item">
+                  {{ d.client.name }} a réservé {{ d.service_offert.service.nom }} le {{ d.date }} — <strong>{{ d.statut }}</strong>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>Aucune demande reçue pour le moment.</p>
+          {% endif %}
+        </div>
+      {% else %}
+        <p>Vous n'avez pas encore de profil prestataire.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

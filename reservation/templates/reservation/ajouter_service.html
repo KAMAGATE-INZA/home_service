@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ajouter un Service{% endblock %}
+
+{% block content %}
+<div class="page-title light-background">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">Ajouter un Service</h1>
+    <nav class="breadcrumbs">
+      <ol>
+        <li><a href="{% url 'home' %}">Accueil</a></li>
+        <li class="current">Ajouter un Service</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<section class="container my-5">
+  <h2 class="text-center mb-4">Ajouter un Service</h2>
+
+  <form method="post" class="row g-3">
+    {% csrf_token %}
+
+    <div class="col-md-6">
+      <label class="form-label">{{ form.service.label }}</label>
+      {{ form.service }}
+      <datalist id="services-list">
+        {% for s in services_autorises %}
+          <option value="{{ s }}">
+        {% endfor %}
+      </datalist>
+      {% if form.service.errors %}
+        <div class="text-danger small">{{ form.service.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ form.prix.label }}</label>
+      {{ form.prix }}
+      {% if form.prix.errors %}
+        <div class="text-danger small">{{ form.prix.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">{{ form.description.label }}</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="text-danger small">{{ form.description.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="col-12 text-center">
+      <button type="submit" class="btn btn-primary">➕ Ajouter</button>
+    </div>
+  </form>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#form-ajout-service');
+    const input = document.querySelector('input[name="service"]');
+    const SERVICES_AUTORISES = [
+      {% for s in services_autorises %}
+        `{{ s|escapejs }}`{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    if (form && input) {
+      form.addEventListener('submit', function (e) {
+        const userInput = input.value.trim().toLowerCase();
+        const isValid = SERVICES_AUTORISES.some(s => s.toLowerCase() === userInput);
+        if (!isValid) {
+          e.preventDefault();
+          alert("Ce service n'est pas reconnu. Veuillez en choisir un service connu.");
+          e.preventDefault();
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
+

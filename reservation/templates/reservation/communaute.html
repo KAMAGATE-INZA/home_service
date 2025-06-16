@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% block content %}
+<section id="team" class="team section">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>Les meilleurs prestataires</h2>
+    </div>
+
+    <div class="row gy-4">
+      {% for p in prestataires %}
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+          <div class="team-member d-flex align-items-start">
+            <div class="pic">
+              <img src="{{ p.photo.url }}" class="img-fluid" alt="{{ p.utilisateur.name }}">
+            </div>
+            <div class="member-info">
+              <a href="{% url 'detail_prestataire' p.id %}">
+                {{ p.utilisateur.name }}
+              </a>
+              <span>{{ p.zone }}</span>
+              <p>
+                {% if p.note_moyenne %}
+                  Note moyenne : {{ p.note_moyenne|floatformat:1 }}/5
+                {% else %}
+                  Pas encore de note
+                {% endif %}
+              </p>
+              <div class="social">
+                {% with email_contact=None %}
+                  {% for contact in p.utilisateur.contacts.all %}
+                    {% if contact.type_contact.nom == "Facebook" %}
+                      <a href="https://facebook.com/{{ contact.contact }}"><i class="bi bi-facebook"></i></a>
+                    {% elif contact.type_contact.nom == "Instagram" %}
+                      <a href="https://instagram.com/{{ contact.contact }}"><i class="bi bi-instagram"></i></a>
+                    {% elif contact.type_contact.nom == "LinkedIn" %}
+                      <a href="https://linkedin.com/in/{{ contact.contact }}"><i class="bi bi-linkedin"></i></a>
+                    {% elif contact.type_contact.nom == "Twitter" %}
+                      <a href="https://twitter.com/{{ contact.contact }}"><i class="bi bi-twitter-x"></i></a>
+                    {% elif contact.type_contact.nom == "WhatsApp" %}
+                      <a href="https://wa.me/{{ contact.contact }}"><i class="bi bi-whatsapp"></i></a>
+                    {% elif contact.type_contact.nom == "Téléphone" %}
+                      <a href="tel:{{ contact.contact }}"><i class="bi bi-telephone"></i></a>
+                    {% elif contact.type_contact.nom == "Email" and contact.contact %}
+                      <a href="mailto:{{ contact.contact }}"><i class="bi bi-envelope"></i></a>
+                      {% with email_contact=1 %}
+                      {% endwith %}
+                    {% endif %}
+                  {% endfor %}
+                  {# Si aucun contact de type Email n'a été trouvé, on affiche l'email du compte #}
+                  {% if not email_contact and p.utilisateur.email %}
+                    <a href="mailto:{{ p.utilisateur.email }}"><i class="bi bi-envelope"></i></a>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<section id="avis-prestataires" class="testimonials section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Un avis sur chacun</h2>
+    </div>
+    <div class="row gy-4">
+      {% for p in prestataires %}
+        {% with avis=avis_par_prestataire|get_item:p.id %}
+          {% if avis %}
+            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+              <div class="testimonial-item">
+                <div class="d-flex align-items-center mb-3">
+                  <img src="{{ p.photo.url }}" class="testimonial-img" alt="{{ p.utilisateur.name }}">
+                  <div class="ps-3">
+                    <h3>{{ p.utilisateur.name }}</h3>
+                    <h4>{{ p.zone }}</h4>
+                  </div>
+                </div>
+                <p>
+                  <i class="bi bi-quote quote-icon-left"></i>
+                  {{ avis.commentaire }}
+                  <i class="bi bi-quote quote-icon-right"></i>
+                </p>
+                <small>par {{ avis.client.name }} — {{ avis.date|date:"d/m/Y" }}</small>
+              </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

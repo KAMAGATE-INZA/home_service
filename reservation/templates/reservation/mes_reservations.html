@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Mes Réservations{% endblock %}
+
+{% block content %}
+<section id="reservations" class="team section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Mes Réservations</h2>
+    </div>
+
+    {% if reservations %}
+      <div class="row gy-4">
+        {% for r in reservations %}
+          <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+            <div class="member w-100">
+              <div class="member-content">
+                <h4>{{ r.service_offert.service.nom }}</h4>
+                <p><strong>Prestataire :</strong> 
+                  <a href="{% url 'detail_prestataire' r.service_offert.prestataire.id %}">
+                    {{ r.service_offert.prestataire.utilisateur.name }}
+                  </a>
+                </p>
+                <p><strong>Date :</strong> {{ r.date }} à {{ r.heure }}</p>
+                <p><strong>Statut :{{ r.get_statut_display }}</strong>
+                  <span class="badge
+                    {% if r.statut == 'en_attente' %} bg-warning text-dark
+                    {% elif r.statut == 'acceptée' %} bg-success
+                    {% elif r.statut == 'refusée' %} bg-danger
+                    {% elif r.statut == 'terminée' %} bg-primary
+                    {% elif r.statut == 'en_attente_confirmation' %} bg-info
+                    {% elif r.statut == 'reportée' %} bg-secondary
+                    {% endif %}">
+                    {{ r.get_statut_display }}
+                  </span>
+                </p>
+
+                {% if r.statut == 'terminée' %}
+                  {% if avis_prestataires_ids and r.service_offert.prestataire.id in avis_prestataires_ids %}
+                    <a href="{% url 'laisser_avis' r.service_offert.prestataire.id %}" class="btn btn-outline-primary btn-sm mt-2">Modifier l’avis</a>
+                  {% else %}
+                    <a href="{% url 'laisser_avis' r.service_offert.prestataire.id %}" class="btn btn-outline-primary btn-sm mt-2">Laisser un avis</a>
+                  {% endif %}
+                  {% if r.service_offert.prestataire.id not in signalements_prestataires_ids %}
+                    <a href="{% url 'signaler_prestataire' r.service_offert.prestataire.id %}" class="btn btn-danger btn-sm mt-2">
+                      Signaler ce prestataire
+                    </a>
+                  {% else %}
+                    <span class="text-danger mt-2">Prestataire signalalé</span>
+                  {% endif %}
+                  
+                {% endif %}
+
+                {% if r.statut == 'en_attente' or r.statut == 'acceptée' %}
+                  <form method="POST" action="{% url 'action_reservation_client' r.id 'annuler' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm mt-2">Annuler</button>
+                  </form>
+                  <a href="{% url 'reporter_reservation' r.id %}" class="btn btn-warning btn-sm mt-2">Reporter</a>
+                {% endif %}
+
+                {% if r.statut == 'en_attente_confirmation' and r.nouvelle_date and r.nouvelle_heure and user != r.reporteur %}
+                  <p class="mt-2">Nouvelle date proposée : <strong>{{ r.nouvelle_date }}</strong> à <strong>{{ r.nouvelle_heure }}</strong></p>
+                  <a href="{% url 'confirmer_report' r.id %}" class="btn btn-success btn-sm">Confirmer</a>
+                  <a href="{% url 'refuser_report' r.id %}" class="btn btn-danger btn-sm">Refuser</a>
+                {% endif %}
+
+                {% if r.statut == 'reportée' and r.nouvelle_date and r.nouvelle_heure %}
+                  <p class="mt-2"><em>Date reportée : <strong>{{ r.date }}</strong> à <strong>{{ r.heure }}</strong></em></p>
+                  <a href="{% url 'reporter_reservation' r.id %}" class="btn btn-warning btn-sm mt-2">Reporter</a>
+                {% endif %}
+
+                <!-- Bouton pour accéder à la messagerie liée à la réservation -->
+                <a href="{% url 'messages_reservation' r.id %}" class="btn btn-primary btn-sm mt-2">
+                  💬 Voir la conversation
+                  {% if r.nb_messages_non_lus > 0 %}
+                    <span class="badge bg-danger">{{ r.nb_messages_non_lus }}</span>
+                  {% endif %}
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>Vous n'avez pas encore de réservations.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

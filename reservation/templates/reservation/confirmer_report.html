@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Confirmer la nouvelle date proposée</h2>
+<p>Nouvelle date proposée : <strong>{{ reservation.nouvelle_date }}</strong> à <strong>{{ reservation.nouvelle_heure }}</strong></p>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-success">Confirmer</button>
+</form>
+{% endblock %}

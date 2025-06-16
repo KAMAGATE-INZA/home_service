@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Conversation réservation{% endblock %}
+
+{% block content %}
+<section class="container my-5">
+  <div class="section-title">
+    <h2>💬 Conversation pour la réservation du service</h2>
+    <p><strong>Service :</strong> {{ reservation.service_offert.service.nom }}</p>
+    <p><strong>Prestataire :</strong> {{ reservation.service_offert.prestataire.utilisateur.name }}</p>
+    <p><strong>Client :</strong> {{ reservation.client.name }}</p>
+  </div>
+
+  <div class="card shadow-sm mb-4" style="max-height: 450px; overflow-y: auto;">
+    <div class="card-body">
+      {% for msg in messages_list %}
+        <div class="mb-4 {% if msg.sender == user %}text-end{% endif %}">
+          <div>
+            <small class="fw-bold">{{ msg.sender.name }}</small>
+            <small class="text-muted">{{ msg.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
+          <div class="d-inline-block px-3 py-2 rounded 
+                      {% if msg.sender == user %}
+                        bg-primary text-white
+                      {% else %}
+                        bg-light
+                      {% endif %}">
+            {{ msg.content|linebreaksbr }}
+          </div>
+          {% if msg.sender == user %}
+            <form method="post" action="{% url 'supprimer_message' msg.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-link text-danger" title="Supprimer">
+                🗑️
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p class="text-center text-muted">Aucun message pour cette réservation.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <form method="post" class="mt-3">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+      {{ form.content.label_tag }}
+      {{ form.content }}
+      {% if form.content.errors %}
+        <div class="text-danger small">{{ form.content.errors.0 }}</div>
+      {% endif %}
+    </div>
+    {{ form.reservation }}
+    <button type="submit" class="btn btn-success">Envoyer</button>
+    <a href="{% url 'boite_reception' %}" class="btn btn-secondary">Retour à la boîte de réception</a>
+  </form>
+</section>
+{% endblock %}

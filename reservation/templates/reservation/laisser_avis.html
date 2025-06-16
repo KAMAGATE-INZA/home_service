@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Laisser un avis{% endblock %}
+
+{% block content %}
+<section class="contact pt-5">
+  <div class="container">
+
+    <div class="section-title">
+      <h2>Laisser un avis</h2>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="d-flex align-items-center mb-4 gap-3">
+          <img src="{{ prestataire.photo.url }}" alt="Photo du prestataire"
+               style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+          <h5 class="m-0">{{ prestataire.utilisateur.name }}</h5>
+        </div>
+
+        {% if is_update %}
+          <p><em>Vous avez déjà laissé un avis pour ce prestataire. Vous pouvez le modifier ci-dessous.</em></p>
+        {% endif %}
+
+        <form method="post" >
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-group mt-3">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="validate" style="color: red;">{{ field.errors.0 }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <div class="text-center mt-4" class="d-flex justify-content-center">
+            <button type="button" class="btn btn-secondary me-2" onclick="window.history.back()">Annuler</button>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

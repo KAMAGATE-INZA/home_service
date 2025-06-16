@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Confirmation de bannissement{% endblock %}
+
+{% block content %}
+<section class="pt-5 pb-5">
+  <div class="container">
+    <h3>❌ Bannir {{ prestataire.utilisateur.name }}</h3>
+    <p><strong>Motif :</strong> {{ signalement.motif }}</p>
+    <p><strong>Description :</strong> {{ signalement.description }}</p>
+
+    <!-- Bouton pour afficher la boîte modale -->
+    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal">
+      Bannir ce prestataire
+    </button>
+    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">Annuler</a>
+  </div>
+</section>
+
+<!-- Modale Bootstrap -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="confirmModalLabel">⚠️ Confirmation de bannissement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir <strong>bannir définitivement</strong> <br><strong>{{ prestataire.utilisateur.name }}</strong> ?</p>
+          <p class="text-danger">Cette action est irréversible et supprimera le compte.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-danger">Oui, bannir</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

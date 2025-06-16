@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}{{ service.nom }} - Détails{% endblock %}
+{% block content %}
+
+  <div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+      <h1 class="mb-2 mb-lg-0">{{ service.nom }}</h1>
+      <nav class="breadcrumbs">
+        <ol>
+          <li><a href="{% url 'home' %}">Accueil</a></li>
+          <li class="current">{{ service.nom }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div><!-- End Page Title -->
+
+  <section id="prestataires" class="team section-bg">
+    <div class="container">
+      <div class="section-title">
+        <h1 class="mb-2 mb-lg-0">{{ service.nom }}</h1>
+      </div>
+      <div class="row gy-4">
+        {% for service_offert in services_offerts %}
+          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="team-member d-flex align-items-start">
+              <div class="pic">
+                <img src="{{ service_offert.prestataire.photo.url }}" class="img-fluid" alt="{{ service_offert.prestataire.utilisateur.name }}">
+              </div>
+              <div class="member-info flex-grow-1">
+                <a href="{% url 'detail_prestataire' service_offert.prestataire.id %}">
+                  <h4>{{ service_offert.prestataire.utilisateur.name }}</h4>
+                </a>
+                <span>{{ service_offert.prestataire.zone }}</span>
+                <p class="mb-1"><strong>Prix proposé :</strong> {{ service_offert.prix }} F CFA</p>
+                <p class="mb-1"><strong>Description :</strong> {{ service_offert.description|truncatewords:20 }}</p>
+                <div class="social">
+                  {% for contact in service_offert.prestataire.utilisateur.contacts.all %}
+                    {% if contact.type_contact.nom == "Facebook" %}
+                      <a href="https://facebook.com/{{ contact.valeur }}"><i class="bi bi-facebook"></i></a>
+                    {% elif contact.type_contact.nom == "Instagram" %}
+                      <a href="https://instagram.com/{{ contact.valeur }}"><i class="bi bi-instagram"></i></a>
+                    {% elif contact.type_contact.nom == "LinkedIn" %}
+                      <a href="https://linkedin.com/in/{{ contact.valeur }}"><i class="bi bi-linkedin"></i></a>
+                    {% elif contact.type_contact.nom == "Twitter" %}
+                      <a href="https://twitter.com/{{ contact.valeur }}"><i class="bi bi-twitter-x"></i></a>
+                    {% elif contact.type_contact.nom == "WhatsApp" %}
+                      <a href="https://wa.me/{{ contact.valeur }}"><i class="bi bi-whatsapp"></i></a>
+                    {% elif contact.type_contact.nom == "Téléphone" %}
+                      <a href="tel:{{ contact.valeur }}"><i class="bi bi-telephone"></i></a>
+                    {% elif contact.type_contact.nom == "Email" and contact.valeur %}
+                      <a href="mailto:{{ contact.valeur }}"><i class="bi bi-envelope"></i></a>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="align-self-center ms-3">
+                <a href="{% url 'reserver_service' service.id %}?prestataire={{ service_offert.prestataire.id }}" class="btn btn-primary">
+                  Réserver
+                </a>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p>Aucun prestataire trouvé.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

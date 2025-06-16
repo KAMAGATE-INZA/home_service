@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Services les plus proposés</h2>
+<form method="get" class="mb-2 text-center">
+    <input type="text" name="q" placeholder="Rechercher un service..." value="{{ query }}" list="services-list" autocomplete="off" class="form-control" style="max-width: 400px; margin: auto;">
+    <datalist id="services-list">
+      {% for name in all_service_names %}
+        <option value="{{ name }}">
+      {% endfor %}
+    </datalist>
+    <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
+</form>
+<div class="row">
+  {% for s in services %}
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ s.nom }}</h5>
+          <p>{{ s.nb_offres }} prestataires proposent ce service</p>
+          <a href="{% url 'service_detail' s.id %}" class="btn btn-primary">Voir les prestataires</a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>Aucun service trouvé.</p>
+  {% endfor %}
+</div>
+{% endblock %}

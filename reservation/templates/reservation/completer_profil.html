@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Compléter mon profil prestataire{% endblock %}
+
+{% block content %}
+  <h2>Compléter mon profil prestataire</h2>
+  <p>Veuillez renseigner les informations ci-dessous pour activer votre profil de prestataire.</p>
+
+  <form method="POST" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div style="color: red;">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="search-button">Enregistrer</button>
+  </form>
+{% endblock %}

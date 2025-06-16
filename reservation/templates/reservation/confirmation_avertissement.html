@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Confirmation avertissement{% endblock %}
+
+{% block content %}
+<section class="pt-5 pb-5">
+  <div class="container">
+    <h3>⚠️ Envoyer un avertissement à {{ prestataire.utilisateur.name }}</h3>
+    <p><strong>Motif :</strong> {{ signalement.motif }}</p>
+    <p><strong>Description :</strong> {{ signalement.description }}</p>
+
+    <!-- Bouton pour ouvrir la modale -->
+    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmModal">
+      ✅ Confirmer l'avertissement
+    </button>
+    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary">Annuler</a>
+  </div>
+</section>
+
+<!-- Modale Bootstrap -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title" id="confirmModalLabel">Confirmer l'action</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p>⚠️ Voulez-vous vraiment envoyer un avertissement à <strong>{{ prestataire.utilisateur.name }}</strong> ?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-warning">Oui, envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
