@@ -79,30 +79,29 @@
       {% for p in prestataires %}
         {% with avis=avis_par_prestataire|get_item:p.id %}
           {% if avis %}
-            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
               <div class="testimonial-item">
-                <div class="d-flex align-items-center mb-3">
                 {% if p.photo %}
-                <div class="pic">
-                  <img src="{{ p.photo.url }}" class="img-fluid" alt="{{ p.utilisateur.name }}">
-                </div>
-                  {% else %}
-                    <div class="pic">
-                      <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="{{ p.utilisateur.name }}">
-                    </div>
-                  {% endif %}
-                  <div class="ps-3">
-                    <h3>{{ p.utilisateur.name }}</h3>
-                    <h4>{{ p.zone }}</h4>
-                  </div>
+                  <img src="{{ p.photo.url }}" class="testimonial-img rounded-circle" alt="Photo de {{ a.prestataire.utilisateur.name }}">
+                {% else %}
+                  <img src="{% static 'img/default-avatar.png' %}" class="testimonial-img rounded-circle" alt="Default Avatar">
+                {% endif %}
+                <h3>{{ p.utilisateur.name }}</h3>
+                <h4>{{ p.utilisateur.email }}</h4>
+                <div class="stars">
+                  <i class="bi bi-star-fill">{{ p.note }}</i>
                 </div>
                 <p>
                   <i class="bi bi-quote quote-icon-left"></i>
-                  {{ avis.commentaire }}
+                  <span>{{ avis.commentaire|truncatewords:25 }}</span>
+                  <small>Par {{ avis.client.name }} le {{ avis.date|date:"d/m/Y" }}</small>
                   <i class="bi bi-quote quote-icon-right"></i>
                 </p>
-                <small>par {{ avis.client.name }} — {{ avis.date|date:"d/m/Y" }}</small>
               </div>
+            </div>
+          {% else %}
+            <div class="col-lg-12 text-center">
+              <p class="text-muted">Aucun témoignage trouvé.</p>
             </div>
           {% endif %}
         {% endwith %}
