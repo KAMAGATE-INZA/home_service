@@ -48,11 +48,3 @@ python manage.py migrate
 python manage.py createsuperuser
 
 # 7. Lancer le serveur
-python manage.py runserver
-
-# 📦 Base de données MySQL
-DB_NAME=home_service
-DB_USER=Kamagate Inza
-DB_PASSWORD=@14285948S
-DB_HOST=localhost
-DB_PORT=3306
