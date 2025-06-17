@@ -36,7 +36,7 @@
             <ul class="list-group">
               {% for contact in user.contacts.all %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span><strong>{{ contact.type_contact.nom }} :</strong> {{ contact.valeur }}</span>
+                  <span><strong>{{ contact.type_contact.nom }} :</strong> {{ contact.contact }}</span>
                   <span>
                     <a href="{% url 'modifier_contact' contact.id %}" class="btn btn-sm btn-link">Modifier</a>
                     <a href="{% url 'supprimer_contact' contact.id %}" class="btn btn-sm btn-link text-danger">Supprimer</a>
