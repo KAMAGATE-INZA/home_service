@@ -4,26 +4,28 @@
 {% block content %}
 <section class="pt-5 pb-5">
   <div class="container">
-
-    <div class="section-title">
+    <div class="section-title text-center">
       <h2>👋 Bonjour {{ user.name }}</h2>
-        
       <p>Bienvenue sur votre tableau de bord</p>
     </div>
+
     {% if user.is_authenticated and user.role == 'prestataire' and user.signalements.exists %}
-      <a href="{% url 'mes_signalements' %}" class="btn btn-outline-danger">Plaintes reçues</a>
+      <div class="text-center mb-4">
+        <a href="{% url 'mes_signalements' %}" class="btn btn-outline-danger">📩 Plaintes reçues</a>
+      </div>
     {% endif %}
+
     {% if user.role == 'client' %}
-      <div class="row gy-4">
-        <div class="col-lg-6">
-          <div class="icon-box">
+      <div class="row gy-4 justify-content-center">
+        <div class="col-md-4">
+          <div class="icon-box text-center">
             <h4>{{ reservations|length }}</h4>
             <p>Réservations effectuées</p>
           </div>
         </div>
         {% if dernier_avis %}
-        <div class="col-lg-6">
-          <div class="icon-box">
+        <div class="col-md-4">
+          <div class="icon-box text-center">
             <h4>{{ dernier_avis.note }}/5</h4>
             <p>Dernière note donnée</p>
           </div>
@@ -31,28 +33,27 @@
         {% endif %}
       </div>
 
-      <div class="mt-4">
+      <div class="text-center mt-4">
         <a href="{% url 'page_services' %}" class="btn btn-primary me-2">Faire une demande</a>
         <a href="{% url 'mes_reservations' %}" class="btn btn-outline-secondary">Mes demandes</a>
       </div>
-
     {% elif user.role == 'prestataire' %}
       {% if has_prestataire_profile %}
-        <div class="row gy-4">
+        <div class="row gy-4 justify-content-center">
           <div class="col-md-4">
-            <div class="icon-box">
+            <div class="icon-box text-center">
               <h4>{{ services|length }}</h4>
-              <p><a href="{% url 'mes_services' %}" class=" me-2">Services proposés</a></p>
+              <p><a href="{% url 'mes_services' %}">Services proposés</a></p>
             </div>
           </div>
           <div class="col-md-4">
-            <div class="icon-box">
+            <div class="icon-box text-center">
               <h4>{{ demandes|length }}</h4>
-              <p><a href="{% url 'mes_reservations_prestataire' %}" class=" me-2">Demandes reçues</a></p>
+              <p><a href="{% url 'mes_reservations_prestataire' %}">Demandes reçues</a></p>
             </div>
           </div>
           <div class="col-md-4">
-            <div class="icon-box">
+            <div class="icon-box text-center">
               <h4>{{ note_moyenne }}</h4>
               <p>Note moyenne ★</p>
             </div>
@@ -60,7 +61,7 @@
         </div>
 
         <div class="mt-5">
-          <h4>📋 Liste des services offerts</h4>
+          <h4>📋 Vos services</h4>
           <ul class="list-group">
             {% for s in services %}
               <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -70,13 +71,13 @@
                   <em>{{ s.prix }} FCFA</em>
                 </div>
                 <div>
-                  <a href="{% url 'modifier_service' s.id %}" class="me-2" title="Modifier">
-                    <i class="bi bi-pencil-square"></i>
+                  <a href="{% url 'modifier_service' s.id %}" title="Modifier">
+                    <i class="bi bi-pencil-square me-2"></i>
                   </a>
                   <form action="{% url 'supprimer_service' s.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit" title="Supprimer" onclick="return confirm('Voulez-vous vraiment supprimer ce service ?');" style="background:none; border:none;">
-                      <i class="bi bi-trash" style="color:red;"></i>
+                    <button type="submit" onclick="return confirm('Supprimer ce service ?');" style="background:none; border:none;">
+                      <i class="bi bi-trash text-danger"></i>
                     </button>
                   </form>
                 </div>
@@ -85,22 +86,23 @@
           </ul>
         </div>
 
-        <div class="mt-4 d-flex gap-2 flex-wrap">
-          <a href="{% url 'ajouter_service_offert' %}" class="btn btn-primary me-2">Ajouter un service</a>
-          <a href="{% url 'mes_reservations_prestataire' %}" class="btn btn-outline-secondary me-2"> Demandes</a>
-          <a href="{% url 'mes_services' %}" class="btn btn-primary">📋 Mes services</a>
-          <a href="{% url 'boite_reception_prestataire' %}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-inbox"></i> Messages reçus
+        <div class="mt-4 d-flex gap-2 flex-wrap justify-content-center">
+          <a href="{% url 'ajouter_service_offert' %}" class="btn btn-primary">+ Ajouter un service</a>
+          <a href="{% url 'mes_reservations_prestataire' %}" class="btn btn-outline-secondary">📨 Demandes</a>
+          <a href="{% url 'boite_reception_prestataire' %}" class="btn btn-outline-primary">
+            <i class="bi bi-inbox"></i> Messages
           </a>
-          <a href="{% url 'messages_admin_prestataire' user.prestataire.id %}" class="btn btn-outline-secondary shadow-sm">
-            <i class="bi bi-chat-dots"></i> Contacter l’administrateur
+          <a href="{% url 'messages_admin_prestataire' user.prestataire.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-chat-dots"></i> Contacter admin
           </a>
         </div>
       {% else %}
-        <div class="alert alert-warning mt-4">
-          ⚠️ Vous n'avez pas encore de profil prestataire actif.
+        <div class="alert alert-warning text-center mt-4">
+          ⚠️ Vous devez compléter votre profil de prestataire.
         </div>
-        <a href="{% url 'completer_profil_prestataire' %}" class="btn btn-primary"> Devenir prestataire</a>
+        <div class="text-center">
+          <a href="{% url 'completer_profil_prestataire' %}" class="btn btn-primary">Compléter le profil</a>
+        </div>
       {% endif %}
     {% endif %}
 
@@ -115,17 +117,17 @@
                 {{ notif.message }}<br>
                 <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
               </div>
-              <a href="{% url 'marquer_notification_lue' notif.id %}" class="btn btn-sm btn-outline-success">Marquer comme lue</a>
+              <a href="{% url 'marquer_notification_lue' notif.id %}" class="btn btn-sm btn-outline-success">✔ Marquer lue</a>
             </li>
           {% endfor %}
         </ul>
-        <a href="{% url 'marquer_tout_lu' %}" class="btn btn-secondary">Tout marquer comme lu</a>
+        <a href="{% url 'marquer_tout_lu' %}" class="btn btn-secondary">✔ Tout marquer comme lu</a>
       {% else %}
-        <p>Aucune notification.</p>
+        <p class="text-muted">Aucune notification.</p>
       {% endif %}
 
       <div class="mt-3">
-        <a href="{% url 'historique_notifications' %}">📜 Historique des notifications</a>
+        <a href="{% url 'historique_notifications' %}">📜 Historique complet</a>
       </div>
 
       {% if notifications_auto %}
@@ -140,22 +142,19 @@
           </ul>
         </div>
       {% endif %}
-
-        {% if signalement.prestataire.utilisateur == user %}
-          <a href="{% url 'defense_signalement' signalement.id %}">Défendre</a>
-        {% endif %}
     </div>
+
     <!-- Statistiques -->
-    <div class="mt-5">
+    <div class="mt-5 text-center">
       {% if has_prestataire_profile %}
-        <h4>📈 Statistiques de votre activité</h4>
-        <p>Consultez vos statistiques détaillées pour mieux comprendre votre activité.</p>
-        <a href="{% url 'statistiques' %}" class="btn btn-primary">📊 Voir les statistiques</a>
+        <h4>📈 Statistiques</h4>
+        <p>Analysez vos performances.</p>
+        <a href="{% url 'statistiques' %}" class="btn btn-primary">📊 Voir les stats</a>
       {% else %}
         {% if user.role == 'prestataire' %}
-        <div class="alert alert-warning">
-          ⚠️ Vous devez compléter votre profil prestataire pour accéder aux statistiques.
-        </div>
+          <div class="alert alert-warning">
+            ⚠️ Complétez votre profil pour accéder aux statistiques.
+          </div>
         {% endif %}
       {% endif %}
     </div>

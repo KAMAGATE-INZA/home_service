@@ -2,15 +2,25 @@ import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from accounts.models import TypeContact, ContactUtilisateur
-from reservation.models import Service, ServiceOffert, Reservation, Avis
+from reservation.models import Service, ServiceOffert, Reservation, Avis, Prestataire
 from django.utils import timezone
 from datetime import timedelta
-from reservation.models import Prestataire
 from reservation.utils import SERVICES_AUTORISES
 
-
-
 User = get_user_model()
+
+descriptions_possibles = [
+    "Service professionnel de {service} proposé par {prestataire}",
+    "Besoin de {service} ? {prestataire} est à votre service !",
+    "{prestataire} assure un travail soigné en {service}",
+    "Faites confiance à {prestataire} pour vos besoins en {service}",
+    "Expert en {service}, {prestataire} est là pour vous aider",
+    "{prestataire} : la référence en matière de {service}",
+    "{service} rapide et efficace assuré par {prestataire}",
+    "Un service de qualité en {service} avec {prestataire}",
+    "{prestataire} est votre spécialiste du {service}",
+    "{service} sur mesure avec {prestataire}",
+]
 
 class Command(BaseCommand):
     help = "Supprime les anciennes données et préremplit la base avec des données de test."
@@ -30,17 +40,14 @@ class Command(BaseCommand):
 
         self.stdout.write("✅ Données supprimées.")
 
-        # Création des données
-        self.stdout.write("🛠️ Création des données de test...")
-
-        # Créer les types de contacts
+        # Création des types de contact
         types_contacts = ["Téléphone", "Email", "Facebook", "WhatsApp"]
         type_objs = []
         for t in types_contacts:
             type_obj, _ = TypeContact.objects.get_or_create(nom=t)
             type_objs.append(type_obj)
 
-        # Créer 50 clients
+        # Création des clients
         clients = []
         for i in range(1, 51):
             client = User.objects.create_user(
@@ -51,30 +58,31 @@ class Command(BaseCommand):
             )
             clients.append(client)
 
-        # Créer 50 prestataires avec utilisateur associé
+        # Création des prestataires
         prestataires = []
         zones = ["Abidjan", "Bouaké", "Yamoussoukro", "San Pedro"]
         for i in range(1, 51):
-            prestataire_user = User.objects.create_user(
+            user = User.objects.create_user(
                 name=f"Prestataire{i}",
                 email=f"prestataire{i}@example.com",
                 password="test1234",
                 role="prestataire"
             )
             prestataire = Prestataire.objects.create(
-                utilisateur=prestataire_user,
+                utilisateur=user,
                 zone=random.choice(zones),
                 evaluation_moyenne=round(random.uniform(3.0, 5.0), 1)
             )
             prestataires.append(prestataire)
 
-        # Ajouter des contacts aléatoires pour clients et prestataires
+        # Ajouter contacts utilisateurs
         for client in clients:
             ContactUtilisateur.objects.create(
                 utilisateur=client,
                 type_contact=random.choice(type_objs),
                 contact=f"0600{random.randint(100000,999999)}"
             )
+
         for prestataire in prestataires:
             ContactUtilisateur.objects.create(
                 utilisateur=prestataire.utilisateur,
@@ -82,30 +90,32 @@ class Command(BaseCommand):
                 contact=f"0700{random.randint(100000,999999)}"
             )
 
+        # Créer les services
         services_objs = []
-
-# Choisir 50 noms uniques au hasard parmi les services autorisés
         noms_choisis = random.sample(SERVICES_AUTORISES, 50)
-
         for nom in noms_choisis:
-            service, created = Service.objects.get_or_create(
-                nom=nom,
-            )
+            service, _ = Service.objects.get_or_create(nom=nom)
             services_objs.append(service)
 
-        print("✅ 50 services créés avec succès.")
+        self.stdout.write("✅ 50 services créés.")
 
-        # Lier des services aux prestataires (3 à 5 services aléatoires chacun)
+        # Associer services offerts aux prestataires avec descriptions
         for prestataire in prestataires:
-            offered_services = random.sample(services_objs, random.randint(3, 5))
-            for service in offered_services:
+            services_selectionnes = random.sample(services_objs, random.randint(3, 5))
+            for service in services_selectionnes:
+                template = random.choice(descriptions_possibles)
+                description = template.format(
+                    service=service.nom.lower(),
+                    prestataire=prestataire.utilisateur.name
+                )
                 ServiceOffert.objects.create(
                     service=service,
                     prestataire=prestataire,
-                    prix=random.randint(5000, 20000)
+                    prix=random.randint(5000, 20000),
+                    description=description
                 )
 
-        # Créer 100 réservations
+        # Créer les réservations
         all_service_offerts = ServiceOffert.objects.all()
         for _ in range(100):
             client = random.choice(clients)
@@ -119,15 +129,25 @@ class Command(BaseCommand):
                 mode_paiement=random.choice(["espèces", "carte", "mobile money"])
             )
 
-        # Créer 50 avis
-        for _ in range(50):
+        # Créer les avis
+        # Créer 50 avis sans doublon (client, prestataire)
+        avis_crees = set()
+        tentatives = 0
+
+        while len(avis_crees) < 50 and tentatives < 500:
             client = random.choice(clients)
             prestataire = random.choice(prestataires)
-            Avis.objects.create(
-                client=client,
-                prestataire=prestataire,
-                note=random.randint(1, 5),
-                commentaire="Avis généré automatiquement."
-            )
+            key = (client.id, prestataire.id)
+
+            if key not in avis_crees:
+                Avis.objects.create(
+                    client=client,
+                    prestataire=prestataire,
+                    note=random.randint(1, 5),
+                    commentaire="Avis généré automatiquement."
+                )
+                avis_crees.add(key)
+            else:
+                tentatives += 1
 
         self.stdout.write(self.style.SUCCESS("✅ Base de données préremplie avec succès !"))
