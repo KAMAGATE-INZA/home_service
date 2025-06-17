@@ -26,3 +26,4 @@ sailor/forms/
 # SYSTÈME
 .DS_Store
 Thumbs.db
+seed_db.py

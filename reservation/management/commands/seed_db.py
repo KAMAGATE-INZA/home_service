@@ -1,10 +1,13 @@
 import random
+from datetime import timedelta, time
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from accounts.models import TypeContact, ContactUtilisateur
-from reservation.models import Service, ServiceOffert, Reservation, Avis, Prestataire
 from django.utils import timezone
-from datetime import timedelta
+from accounts.models import TypeContact, ContactUtilisateur
+from reservation.models import (
+    Service, ServiceOffert, Reservation, Avis,
+    Prestataire, Message, Signalement
+)
 from reservation.utils import SERVICES_AUTORISES
 
 User = get_user_model()
@@ -28,9 +31,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write("⚠️ Suppression des anciennes données...")
 
-        # Supprimer les données dans l'ordre pour respecter les FK
+        # Suppression dans l'ordre
+        Message.objects.all().delete()
         Avis.objects.all().delete()
         Reservation.objects.all().delete()
+        Signalement.objects.all().delete()
         ServiceOffert.objects.all().delete()
         Service.objects.all().delete()
         ContactUtilisateur.objects.all().delete()
@@ -40,14 +45,11 @@ class Command(BaseCommand):
 
         self.stdout.write("✅ Données supprimées.")
 
-        # Création des types de contact
+        # Types de contact
         types_contacts = ["Téléphone", "Email", "Facebook", "WhatsApp"]
-        type_objs = []
-        for t in types_contacts:
-            type_obj, _ = TypeContact.objects.get_or_create(nom=t)
-            type_objs.append(type_obj)
+        type_objs = [TypeContact.objects.create(nom=t) for t in types_contacts]
 
-        # Création des clients
+        # Clients
         clients = []
         for i in range(1, 51):
             client = User.objects.create_user(
@@ -58,7 +60,7 @@ class Command(BaseCommand):
             )
             clients.append(client)
 
-        # Création des prestataires
+        # Prestataires
         prestataires = []
         zones = ["Abidjan", "Bouaké", "Yamoussoukro", "San Pedro"]
         for i in range(1, 51):
@@ -75,22 +77,15 @@ class Command(BaseCommand):
             )
             prestataires.append(prestataire)
 
-        # Ajouter contacts utilisateurs
-        for client in clients:
+        # Contacts
+        for user in clients + [p.utilisateur for p in prestataires]:
             ContactUtilisateur.objects.create(
-                utilisateur=client,
+                utilisateur=user,
                 type_contact=random.choice(type_objs),
-                contact=f"0600{random.randint(100000,999999)}"
+                contact=f"07{random.randint(10000000, 99999999)}"
             )
 
-        for prestataire in prestataires:
-            ContactUtilisateur.objects.create(
-                utilisateur=prestataire.utilisateur,
-                type_contact=random.choice(type_objs),
-                contact=f"0700{random.randint(100000,999999)}"
-            )
-
-        # Créer les services
+        # Services
         services_objs = []
         noms_choisis = random.sample(SERVICES_AUTORISES, 50)
         for nom in noms_choisis:
@@ -99,12 +94,11 @@ class Command(BaseCommand):
 
         self.stdout.write("✅ 50 services créés.")
 
-        # Associer services offerts aux prestataires avec descriptions
+        # Services offerts
         for prestataire in prestataires:
             services_selectionnes = random.sample(services_objs, random.randint(3, 5))
             for service in services_selectionnes:
-                template = random.choice(descriptions_possibles)
-                description = template.format(
+                description = random.choice(descriptions_possibles).format(
                     service=service.nom.lower(),
                     prestataire=prestataire.utilisateur.name
                 )
@@ -115,22 +109,36 @@ class Command(BaseCommand):
                     description=description
                 )
 
-        # Créer les réservations
-        all_service_offerts = ServiceOffert.objects.all()
-        for _ in range(100):
+        # Réservations sans doublon
+        self.stdout.write("📅 Création de réservations...")
+        all_service_offerts = list(ServiceOffert.objects.all())
+        used_combinations = set()
+        reservations = []
+
+        while len(reservations) < 100:
             client = random.choice(clients)
             service_offert = random.choice(all_service_offerts)
-            Reservation.objects.create(
-                client=client,
-                service_offert=service_offert,
-                date=timezone.now().date() + timedelta(days=random.randint(0, 30)),
-                heure=f"{random.randint(8, 18)}:00",
-                statut=random.choice(["en attente", "confirmée", "terminée"]),
-                mode_paiement=random.choice(["espèces", "carte", "mobile money"])
-            )
+            date_obj = timezone.now().date() + timedelta(days=random.randint(0, 30))
+            heure_obj = time(hour=random.randint(8, 18))
 
-        # Créer les avis
-        # Créer 50 avis sans doublon (client, prestataire)
+            key = (client.id, service_offert.id, date_obj, heure_obj)
+
+            if key not in used_combinations:
+                used_combinations.add(key)
+                reservation = Reservation.objects.create(
+                    client=client,
+                    service_offert=service_offert,
+                    date=date_obj,
+                    heure=heure_obj,
+                    statut=random.choice([s[0] for s in Reservation.STATUT_CHOICES]),
+                    mode_paiement=random.choice(["espèces", "carte", "mobile money"])
+                )
+                reservations.append(reservation)
+
+        self.stdout.write(self.style.SUCCESS(f"✅ {len(reservations)} réservations créées."))
+
+        # Avis
+        self.stdout.write("✍️ Création des avis...")
         avis_crees = set()
         tentatives = 0
 
@@ -150,4 +158,31 @@ class Command(BaseCommand):
             else:
                 tentatives += 1
 
-        self.stdout.write(self.style.SUCCESS("✅ Base de données préremplie avec succès !"))
+        self.stdout.write(self.style.SUCCESS(f"✅ {len(avis_crees)} avis créés."))
+
+        # Messages
+        self.stdout.write("💬 Création des messages...")
+        for reservation in random.sample(reservations, 30):
+            Message.objects.create(
+                sender=reservation.client,
+                recipient=reservation.service_offert.prestataire.utilisateur,
+                content="Bonjour, j’ai une question concernant la réservation.",
+                reservation=reservation
+            )
+        self.stdout.write(self.style.SUCCESS("✅ 30 messages créés."))
+
+        # Signalements
+        self.stdout.write("🚨 Création de signalements...")
+        for _ in range(10):
+            client = random.choice(clients)
+            prestataire = random.choice(prestataires)
+            Signalement.objects.create(
+                client=client,
+                prestataire=prestataire,
+                motif="Comportement inapproprié",
+                description="Le prestataire est arrivé en retard sans prévenir.",
+                statut=random.choice(['en_attente', 'averti', 'banni'])
+            )
+        self.stdout.write(self.style.SUCCESS("✅ 10 signalements créés."))
+
+        self.stdout.write(self.style.SUCCESS("🎉 Base de données de test prête !"))
