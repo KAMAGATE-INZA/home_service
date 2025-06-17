@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load custom_tags %}
+{% load static %}
 {% block title %}Meilleurs Prestataires{% endblock %}
 {% block content %}
 
@@ -18,7 +20,11 @@
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
           <div class="team-member d-flex align-items-start">
             <div class="pic">
-              <img src="{{ p.photo.url }}" class="img-fluid" alt="Photo de {{ p.utilisateur.name }}">
+              {% if p.photo %}
+                <img src="{{ p.photo.url }}" class="img-fluid" alt="Photo de {{ p.utilisateur.name }}">
+              {% else %}
+                <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="Photo de {{ p.utilisateur.name }}">
+              {% endif %}
             </div>
             <div class="member-info">
               <h4>

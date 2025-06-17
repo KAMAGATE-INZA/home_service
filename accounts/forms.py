@@ -44,11 +44,16 @@ TYPE_CHOICES = [
 ]
 
 class ContactUtilisateurForm(forms.ModelForm):
+    type_contact = forms.ModelChoiceField(
+        queryset=TypeContact.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Choisir un type de contact"
+    )
+
     class Meta:
         model = ContactUtilisateur
         fields = ['type_contact', 'contact']
         widgets = {
-            'type_contact': forms.Select(attrs={'class': 'form-control'}),
             'contact': forms.TextInput(attrs={'class': 'form-control'})
         }
 

@@ -32,11 +32,14 @@
 
         <div class="mt-3">
           <h5>Contacts</h5>
-          {% if user.contacts.all %}
+          <a href="{% url 'ajouter_contact' %}" class="btn btn-outline-success btn-sm mb-2">+ Ajouter un contact</a>
+          {% if user.contacts.exist %}
             <ul class="list-unstyled">
               {% for contact in user.contacts.all %}
                 <li>
                   <strong>{{ contact.type_contact.nom }} :</strong> {{ contact.contact }}
+                  <a href="{% url 'modifier_contact' contact.id %}" class="btn btn-sm btn-link">Modifier</a>
+                  <a href="{% url 'supprimer_contact' contact.id %}" class="btn btn-sm btn-link text-danger">Supprimer</a>
                 </li>
               {% endfor %}
             </ul>

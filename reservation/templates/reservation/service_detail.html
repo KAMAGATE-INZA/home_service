@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
+{% load static %}
 {% block title %}{{ service.nom }} - Détails{% endblock %}
 {% block content %}
 
@@ -23,9 +25,15 @@
         {% for service_offert in services_offerts %}
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
             <div class="team-member d-flex align-items-start">
-              <div class="pic">
-                <img src="{{ service_offert.prestataire.photo.url }}" class="img-fluid" alt="{{ service_offert.prestataire.utilisateur.name }}">
-              </div>
+              {% if service_offert.prestataire.photo %}
+                <div class="pic">
+                  <img src="{{ service_offert.prestataire.photo.url }}" class="img-fluid" alt="{{ service_offert.prestataire.utilisateur.name }}">
+                </div>
+              {% else %}
+                <div class="pic">
+                  <img src="{% static 'img/default-avatar.png' %}" class="img-fluid" alt="{{ service_offert.prestataire.utilisateur.name }}">
+                </div>
+              {% endif %}
               <div class="member-info flex-grow-1">
                 <a href="{% url 'detail_prestataire' service_offert.prestataire.id %}">
                   <h4>{{ service_offert.prestataire.utilisateur.name }}</h4>

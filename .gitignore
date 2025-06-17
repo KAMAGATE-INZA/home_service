@@ -11,8 +11,7 @@ __pycache__/
 *.sqlite3
 
 # STATIC & MEDIA (si générés automatiquement)
-media/
-staticfiles/
+
 
 # MIGRATIONS compilées
 **/migrations/

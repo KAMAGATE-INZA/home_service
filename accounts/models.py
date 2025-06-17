@@ -68,4 +68,6 @@ class ContactUtilisateur(models.Model):
     contact = models.CharField(max_length=100)  # Ex: le numéro ou l'email
 
     def __str__(self):
-        return f"{self.utilisateur} - {self.type_contact.nom}: {self.valeur}"
+        return f"{self.utilisateur} - {self.type_contact.nom}: {self.contact}"
+
+

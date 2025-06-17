@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Supprimer un contact{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Supprimer le contact</h2>
+  <p>Voulez-vous vraiment supprimer ce contact ?</p>
+  <p><strong>{{ contact.type_contact.nom }} :</strong> {{ contact.contact }}</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'profil' %}" class="btn btn-secondary">Annuler</a>
+  </form>
+</div>
+{% endblock %}

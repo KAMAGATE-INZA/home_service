@@ -137,3 +137,43 @@ def statistiques_view(request):
         'labels': labels,
         'data': data
     })
+
+@login_required
+def ajouter_contact(request):
+    if request.method == 'POST':
+        form = ContactUtilisateurForm(request.POST)
+        if form.is_valid():
+            contact = form.save(commit=False)
+            contact.utilisateur = request.user
+            contact.save()
+            messages.success(request, "Contact ajouté avec succès.")
+            return redirect('profil')  # Redirige vers la page du profil
+    else:
+        form = ContactUtilisateurForm()
+
+    return render(request, 'accounts/ajouter_contact.html', {'form': form})
+@login_required
+def modifier_contact(request, contact_id):
+    contact = get_object_or_404(ContactUtilisateur, id=contact_id, utilisateur=request.user)
+
+    if request.method == 'POST':
+        form = ContactUtilisateurForm(request.POST, instance=contact)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Contact mis à jour avec succès.")
+            return redirect('profil')
+    else:
+        form = ContactUtilisateurForm(instance=contact)
+
+    return render(request, 'accounts/modifier_contact.html', {'form': form})
+
+@login_required
+def supprimer_contact(request, contact_id):
+    contact = get_object_or_404(ContactUtilisateur, id=contact_id, utilisateur=request.user)
+
+    if request.method == 'POST':
+        contact.delete()
+        messages.success(request, "Contact supprimé avec succès.")
+        return redirect('profil')
+
+    return render(request, 'accounts/supprimer_contact.html', {'contact': contact})
